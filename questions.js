@@ -1,5 +1,4 @@
-/* --- QUESTIONS DATABASE --- */
-const questions = [
+window.questions = [
     {
         question: "Who is known as the 'Iron Man' of India?",
         answers: [
