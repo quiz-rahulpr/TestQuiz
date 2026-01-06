@@ -5,118 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SSC/RRB Style Exam</title>
     <style>
-        /* --- CBT STYLE LAYOUT --- */
         :root {
             --header-height: 60px;
             --sidebar-width: 280px;
-            --ssc-green: #28a745;   /* Answered */
-            --ssc-red: #dc3545;     /* Not Answered */
-            --ssc-purple: #6f42c1;  /* Review */
-            --ssc-grey: #e9ecef;    /* Not Visited */
+            --ssc-green: #28a745; --ssc-red: #dc3545; --ssc-purple: #6f42c1; --ssc-grey: #e9ecef;
         }
-
         body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; }
-
-        /* HEADER */
-        header {
-            height: var(--header-height);
-            background: #333;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-        }
+        header { height: var(--header-height); background: #333; color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
         .timer { font-size: 1.2rem; font-weight: bold; background: black; padding: 5px 15px; border-radius: 4px; border: 1px solid white;}
-
-        /* MAIN LAYOUT */
-        .main-container {
-            display: flex;
-            height: calc(100vh - var(--header-height));
-        }
-
-        /* LEFT SIDE: QUESTION AREA */
-        .question-area {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: white;
-            border-right: 2px solid #ddd;
-        }
+        .main-container { display: flex; height: calc(100vh - var(--header-height)); }
+        .question-area { flex: 1; padding: 20px; overflow-y: auto; background: white; border-right: 2px solid #ddd; }
         .q-header { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.1rem; }
         .q-text { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.5; }
-        
-        /* OPTIONS (RADIO BUTTONS) */
         .options-list { list-style: none; padding: 0; }
         .options-list li { margin-bottom: 15px; }
-        .options-list label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            transition: 0.2s;
-        }
+        .options-list label { display: flex; align-items: center; cursor: pointer; padding: 10px; border: 1px solid #ddd; border-radius: 5px; transition: 0.2s; }
         .options-list label:hover { background: #f0f8ff; }
         .options-list input[type="radio"] { margin-right: 15px; transform: scale(1.3); }
-
-        /* BUTTON FOOTER */
-        .action-buttons {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .action-buttons { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; flex-wrap: wrap; }
         .btn { padding: 10px 15px; border: none; cursor: pointer; color: white; border-radius: 4px; font-weight: bold; }
-        .btn-save { background: var(--ssc-green); }
-        .btn-review { background: var(--ssc-purple); }
-        .btn-clear { background: #ffc107; color: black; }
-        .btn-prev { background: #6c757d; }
-        .btn-submit { background: #0056b3; margin-left: auto; }
-
-        /* RIGHT SIDE: PALETTE */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #f8f9fa;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            border-left: 1px solid #ccc;
-        }
-        .palette-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 10px;
-            overflow-y: auto;
-        }
-        .palette-item {
-            height: 40px;
-            width: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        /* Palette Colors */
+        .btn-save { background: var(--ssc-green); } .btn-review { background: var(--ssc-purple); } .btn-clear { background: #ffc107; color: black; } .btn-prev { background: #6c757d; } .btn-submit { background: #0056b3; margin-left: auto; }
+        .sidebar { width: var(--sidebar-width); background: #f8f9fa; padding: 10px; display: flex; flex-direction: column; border-left: 1px solid #ccc; }
+        .palette-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 10px; overflow-y: auto; }
+        .palette-item { height: 40px; width: 40px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #ccc; border-radius: 50%; cursor: pointer; font-weight: bold; }
         .p-answered { background: var(--ssc-green); color: white; border: none; clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%); border-radius: 0; }
         .p-not_answered { background: var(--ssc-red); color: white; border: none; clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%); border-radius: 0; }
         .p-review { background: var(--ssc-purple); color: white; border-radius: 50%; }
         .p-current { border: 2px solid blue; }
-
-        /* RESULT OVERLAY */
-        #result-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+        #result-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .hidden { display: none; }
         table { border-collapse: collapse; margin: 20px 0; width: 80%; max-width: 500px; }
         td, th { border: 1px solid #ddd; padding: 12px; text-align: left; }
@@ -132,13 +48,9 @@
 
 <div class="main-container" id="quiz-interface">
     <div class="question-area">
-        <div class="q-header">
-            Question No. <span id="q-number">1</span>
-        </div>
+        <div class="q-header">Question No. <span id="q-number">1</span></div>
         <div id="q-text" class="q-text">Loading...</div>
-        
         <ul class="options-list" id="options-container"></ul>
-
         <div class="action-buttons">
             <button class="btn btn-review" onclick="markReview()">Mark for Review</button>
             <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
@@ -147,7 +59,6 @@
             <button class="btn btn-submit" onclick="submitQuiz()">Submit Test</button>
         </div>
     </div>
-
     <div class="sidebar">
         <h3>Questions Palette</h3>
         <div class="palette-grid" id="palette-grid"></div>
@@ -162,7 +73,6 @@
         <tr><th>Review</th><td id="sum-review">0</td></tr>
         <tr><th>Skipped</th><td id="sum-skipped">0</td></tr>
     </table>
-    
     <p>Please enter your name to finalize submission:</p>
     <input type="text" id="student-name" placeholder="Full Name" style="padding:10px; width:200px;">
     <button class="btn btn-save" onclick="sendToGoogle()">Confirm Submission</button>
@@ -175,7 +85,7 @@
     const NEGATIVE_MARK = 0.25; 
     const POSITIVE_MARK = 1;
     
-    // YOUR GOOGLE FORM IDs
+    // YOUR FORM IDS
     const FORM_ID = "1FAIpQLSfdc6KygQ100hICyXkaJYIWVJ7UxKYUw4aV22smmT3nRWCu3g"; 
     const ENTRY_NAME = "entry.1088098272";
     const ENTRY_SCORE = "entry.1899459571";
@@ -189,11 +99,13 @@
     let secondsElapsed = 0;
 
     window.onload = function() {
-        // Check if questions loaded correctly
-        if (typeof questions === 'undefined' || questions.length === 0) {
-            alert("Error: 'questions.js' file not found or empty! Please check filename.");
+        // --- SAFETY CHECK START ---
+        if (typeof window.questions === 'undefined' || window.questions.length === 0) {
+            alert("⚠️ CRITICAL ERROR: The file 'questions.js' did not load.\n\n1. Make sure the file is named exactly 'questions.js' (lowercase).\n2. Make sure it is in the same folder as index.html.\n3. Refresh the page in 1 minute.");
             return;
         }
+        // --- SAFETY CHECK END ---
+        
         initPalette();
         loadQuestion(0);
         startTimer();
@@ -202,7 +114,7 @@
     function initPalette() {
         const grid = document.getElementById("palette-grid");
         grid.innerHTML = "";
-        questions.forEach((q, index) => {
+        window.questions.forEach((q, index) => {
             const div = document.createElement("div");
             div.className = "palette-item";
             div.innerText = index + 1;
@@ -216,12 +128,12 @@
         updateStatus(currentQIndex);
         currentQIndex = index;
         document.getElementById("q-number").innerText = currentQIndex + 1;
-        document.getElementById("q-text").innerText = questions[currentQIndex].question;
+        document.getElementById("q-text").innerText = window.questions[currentQIndex].question;
         
         const optionsContainer = document.getElementById("options-container");
         optionsContainer.innerHTML = "";
         
-        questions[currentQIndex].answers.forEach((ans, i) => {
+        window.questions[currentQIndex].answers.forEach((ans, i) => {
             const li = document.createElement("li");
             li.innerHTML = `
                 <label>
@@ -264,13 +176,13 @@
 
     function changeQuestion(step) {
         let newIndex = currentQIndex + step;
-        if (newIndex >= 0 && newIndex < questions.length) {
+        if (newIndex >= 0 && newIndex < window.questions.length) {
             loadQuestion(newIndex);
         }
     }
 
     function moveNext() {
-        if (currentQIndex < questions.length - 1) {
+        if (currentQIndex < window.questions.length - 1) {
             loadQuestion(currentQIndex + 1);
         } else {
             updateStatus(currentQIndex);
@@ -289,7 +201,7 @@
     }
 
     function updatePaletteVisuals() {
-        questions.forEach((_, i) => {
+        window.questions.forEach((_, i) => {
             const pItem = document.getElementById(`palette-${i}`);
             pItem.className = "palette-item"; 
             if (i === currentQIndex) pItem.classList.add("p-current");
@@ -315,15 +227,15 @@
 
         let attempted = 0;
         let reviewed = 0;
-        questions.forEach((_, i) => {
+        window.questions.forEach((_, i) => {
             if (questionStatus[i] === "answered") attempted++;
             if (questionStatus[i] === "review") reviewed++;
         });
 
-        document.getElementById("sum-total").innerText = questions.length;
+        document.getElementById("sum-total").innerText = window.questions.length;
         document.getElementById("sum-attempted").innerText = attempted;
         document.getElementById("sum-review").innerText = reviewed;
-        document.getElementById("sum-skipped").innerText = questions.length - attempted - reviewed;
+        document.getElementById("sum-skipped").innerText = window.questions.length - attempted - reviewed;
     }
 
     function sendToGoogle() {
@@ -331,7 +243,7 @@
         if (!name) { alert("Enter Name"); return; }
 
         let finalScore = 0;
-        questions.forEach((q, index) => {
+        window.questions.forEach((q, index) => {
             const userAnswer = userAnswers[index];
             if (userAnswer !== undefined) {
                 if (q.answers[userAnswer].correct) finalScore += POSITIVE_MARK;
