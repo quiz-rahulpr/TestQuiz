@@ -1,38 +1,48 @@
 const questions = [
     {
-        question: "What is the capital of France?",
+        question: "Who is known as the 'Iron Man' of India?",
         answers: [
-            { text: "Berlin", correct: false },
-            { text: "Madrid", correct: false },
-            { text: "Paris", correct: true },
-            { text: "Lisbon", correct: false }
+            { text: "Jawaharlal Nehru", correct: false },
+            { text: "Sardar Vallabhbhai Patel", correct: true },
+            { text: "Subhash Chandra Bose", correct: false },
+            { text: "Mahatma Gandhi", correct: false }
         ]
     },
     {
-        question: "Which planet is known as the Red Planet?",
+        question: "Which article of the Indian Constitution deals with the Fundamental Rights?",
         answers: [
-            { text: "Earth", correct: false },
-            { text: "Mars", correct: true },
-            { text: "Jupiter", correct: false },
-            { text: "Saturn", correct: false }
+            { text: "Article 12-35", correct: true },
+            { text: "Article 51A", correct: false },
+            { text: "Article 36-50", correct: false },
+            { text: "Article 370", correct: false }
         ]
     },
     {
-        question: "What is 2 + 2?",
+        question: "If A:B = 2:3 and B:C = 4:5, then what is A:B:C?",
         answers: [
-            { text: "3", correct: false },
-            { text: "4", correct: true },
-            { text: "5", correct: false },
-            { text: "22", correct: false }
+            { text: "8:12:15", correct: true },
+            { text: "2:3:5", correct: false },
+            { text: "8:10:15", correct: false },
+            { text: "4:6:9", correct: false }
         ]
     },
     {
-        question: "Which runs in a web browser?",
+        question: "Which gas is used in electric bulbs?",
         answers: [
-            { text: "Java", correct: false },
-            { text: "C", correct: false },
-            { text: "Python", correct: false },
-            { text: "JavaScript", correct: true }
+            { text: "Oxygen", correct: false },
+            { text: "Nitrogen", correct: false },
+            { text: "Argon", correct: true },
+            { text: "Carbon Dioxide", correct: false }
+        ]
+    },
+    {
+        question: "Identify the odd one out: 4, 9, 16, 25, 32",
+        answers: [
+            { text: "9", correct: false },
+            { text: "16", correct: false },
+            { text: "25", correct: false },
+            { text: "32", correct: true } 
+            /* Reason: All others are perfect squares */
         ]
     }
 ];
