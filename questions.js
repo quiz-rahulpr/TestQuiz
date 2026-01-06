@@ -1,3 +1,4 @@
+/* --- QUESTIONS DATABASE --- */
 const questions = [
     {
         question: "Who is known as the 'Iron Man' of India?",
@@ -42,7 +43,6 @@ const questions = [
             { text: "16", correct: false },
             { text: "25", correct: false },
             { text: "32", correct: true } 
-            /* Reason: All others are perfect squares */
         ]
     }
 ];
