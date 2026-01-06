@@ -3,218 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Quiz Platform</title>
+    <title>SSC/RRB Style Exam</title>
     <style>
-        /* --- CSS STYLES --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+        /* --- CBT STYLE LAYOUT --- */
+        :root {
+            --header-height: 60px;
+            --sidebar-width: 280px;
+            --primary-blue: #007bff;
+            --ssc-green: #28a745;   /* Answered */
+            --ssc-red: #dc3545;     /* Not Answered */
+            --ssc-purple: #6f42c1;  /* Review */
+            --ssc-grey: #e9ecef;    /* Not Visited */
+        }
+
+        body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; }
+
+        /* HEADER */
+        header {
+            height: var(--header-height);
+            background: #333;
+            color: white;
             display: flex;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            justify-content: space-between;
+            padding: 0 20px;
         }
-        .quiz-container {
+        .timer { font-size: 1.2rem; font-weight: bold; background: black; padding: 5px 15px; border-radius: 4px; border: 1px solid white;}
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            height: calc(100vh - var(--header-height));
+        }
+
+        /* LEFT SIDE: QUESTION AREA */
+        .question-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
             background: white;
-            padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
+            border-right: 2px solid #ddd;
         }
-        h1 { color: #2c3e50; margin-bottom: 10px; }
-        .timer-box {
-            font-size: 1.2rem;
-            color: #e74c3c;
-            font-weight: bold;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #ffecec;
-            border-radius: 5px;
-            display: inline-block;
-        }
-        .question { font-size: 1.3rem; margin-bottom: 25px; color: #34495e; font-weight: 500; }
-        .options-container { display: flex; flex-direction: column; gap: 12px; }
-        .btn {
-            padding: 14px 20px;
-            border: 2px solid #3498db;
-            background: transparent;
-            color: #3498db;
-            border-radius: 8px;
+        .q-header { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.1rem; }
+        .q-text { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.5; }
+        
+        /* OPTIONS (RADIO BUTTONS) */
+        .options-list { list-style: none; padding: 0; }
+        .options-list li { margin-bottom: 15px; }
+        .options-list label {
+            display: flex;
+            align-items: center;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             transition: 0.2s;
         }
-        .btn:hover { background: #3498db; color: white; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .hidden { display: none; }
-        
-        .result-box { margin-top: 20px; }
-        .score-text { font-size: 2rem; color: #27ae60; font-weight: bold; margin: 20px 0; }
-        
-        input[type="text"] {
-            padding: 12px;
-            width: 70%;
-            margin-top: 20px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            outline: none;
+        .options-list label:hover { background: #f0f8ff; }
+        .options-list input[type="radio"] { margin-right: 15px; transform: scale(1.3); }
+
+        /* BUTTON FOOTER */
+        .action-buttons {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        input[type="text"]:focus { border-color: #3498db; }
-        
-        .save-btn {
-            margin-top: 15px;
-            padding: 12px 30px;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .btn { padding: 10px 15px; border: none; cursor: pointer; color: white; border-radius: 4px; font-weight: bold; }
+        .btn-save { background: var(--ssc-green); }
+        .btn-review { background: var(--ssc-purple); }
+        .btn-clear { background: #ffc107; color: black; }
+        .btn-prev { background: #6c757d; }
+        .btn-submit { background: #0056b3; margin-left: auto; } /* Pushes to right */
+
+        /* RIGHT SIDE: PALETTE */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #f8f9fa;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #ccc;
+        }
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .palette-item {
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white; /* Default Not Visited */
+            border: 1px solid #ccc;
+            border-radius: 50%; /* Circle shape like SSC */
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: 0.3s;
+            font-weight: bold;
+            position: relative;
         }
-        .save-btn:hover { background-color: #219150; }
+        /* Palette Colors */
+        .p-answered { background: var(--ssc-green); color: white; border: none; clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%); border-radius: 0; /* SSC Shield shape */ }
+        .p-not_answered { background: var(--ssc-red); color: white; border: none; clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 50% 100%, 0% 85%); border-radius: 0; }
+        .p-review { background: var(--ssc-purple); color: white; border-radius: 50%; }
+        .p-current { border: 2px solid blue; }
+
+        /* LEGEND */
+        .legend { font-size: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; padding: 10px; background: white; border: 1px solid #ddd; }
+        .legend div { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 15px; height: 15px; display: inline-block; }
+
+        /* RESULT OVERLAY */
+        #result-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        table { border-collapse: collapse; margin: 20px 0; width: 80%; max-width: 500px; }
+        td, th { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f2f2f2; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
-    <div id="intro-screen">
-        <h1>Final Assessment</h1>
-        <p>You are about to start the quiz.</p>
-        <p><strong>Note:</strong> Your time will be recorded.</p>
-        <button class="btn" style="background: #3498db; color: white;" onclick="startQuiz()">Start Quiz</button>
+<header>
+    <div>SSC/RRB Mock Test</div>
+    <div class="timer">Time Left: <span id="timer">00:00</span></div>
+</header>
+
+<div class="main-container" id="quiz-interface">
+    <div class="question-area">
+        <div class="q-header">
+            Question No. <span id="q-number">1</span>
+        </div>
+        <div id="q-text" class="q-text">Loading question...</div>
+        
+        <div id="q-image-container" style="text-align:center; margin-bottom:20px; display:none;">
+            <img id="q-image" src="" alt="Question Image" style="max-width:100%; max-height:300px; border:1px solid #ddd;">
+        </div>
+
+        <ul class="options-list" id="options-container">
+            </ul>
+
+        <div class="action-buttons">
+            <button class="btn btn-review" onclick="markReview()">Mark for Review</button>
+            <button class="btn btn-clear" onclick="clearResponse()">Clear Response</button>
+            <button class="btn btn-prev" onclick="changeQuestion(-1)">Previous</button>
+            <button class="btn btn-save" onclick="saveAndNext()">Save & Next</button>
+            <button class="btn btn-submit" onclick="submitQuiz()">Submit Test</button>
+        </div>
     </div>
 
-    <div id="quiz-box" class="hidden">
-        <div class="timer-box">Time: <span id="timer-display">0:00</span></div>
-        <div id="question-text" class="question">Loading...</div>
-        <div id="options-box" class="options-container"></div>
+    <div class="sidebar">
+        <div class="legend">
+            <div><span class="dot" style="background:var(--ssc-green)"></span> Answered</div>
+            <div><span class="dot" style="background:var(--ssc-red)"></span> Not Ans</div>
+            <div><span class="dot" style="background:var(--ssc-grey); border:1px solid #ccc"></span> Not Visit</div>
+            <div><span class="dot" style="background:var(--ssc-purple)"></span> Review</div>
+        </div>
+        <h3>Questions Palette</h3>
+        <div class="palette-grid" id="palette-grid">
+            </div>
     </div>
+</div>
+
+<div id="result-screen" class="hidden">
+    <h2>Exam Summary</h2>
+    <table>
+        <tr>
+            <th>Total Questions</th>
+            <td id="sum-total">0</td>
+        </tr>
+        <tr>
+            <th>Attempted (Answered)</th>
+            <td id="sum-attempted">0</td>
+        </tr>
+        <tr>
+            <th>Marked for Review</th>
+            <td id="sum-review">0</td>
+        </tr>
+        <tr>
+            <th>Not Attempted</th>
+            <td id="sum-skipped">0</td>
+        </tr>
+    </table>
     
-    <div id="result-box" class="hidden result-box">
-        <h1>Quiz Completed!</h1>
-        <div class="score-text">Score: <span id="score">0</span> / <span id="total">0</span></div>
-        <p>Time Taken: <span id="final-time">0:00</span></p>
-        
-        <p>Enter your full name to submit your score:</p>
-        <input type="text" id="student-name" placeholder="Ex: Rahul P.">
-        <br>
-        <button class="save-btn" onclick="submitData()">Submit Score</button>
-    </div>
+    <p>Please enter your name to finalize submission:</p>
+    <input type="text" id="student-name" placeholder="Full Name" style="padding:10px; width:200px;">
+    <button class="btn btn-save" onclick="sendToGoogle()">Confirm Submission</button>
 </div>
 
 <script src="questions.js"></script>
 
 <script>
-    /* --- GOOGLE FORM CONFIGURATION (ALREADY FILLED) --- */
-    const FORM_ID = "1FAIpQLSfdc6KygQ100hICyXkaJYIWVJ7UxKYUw4aV22smmT3nRWCu3g";
+    /* --- CONFIGURATION --- */
+    const NEGATIVE_MARK = 0.25; // Deduct 0.25 for wrong answer
+    const POSITIVE_MARK = 1;    // Add 1 for correct answer
+    
+   // GOOGLE FORM CONFIG (YOUR SPECIFIC IDS)
+    const FORM_ID = "1FAIpQLSfdc6KygQ100hICyXkaJYIWVJ7UxKYUw4aV22smmT3nRWCu3g"; 
     const ENTRY_NAME = "entry.1088098272";
     const ENTRY_SCORE = "entry.1899459571";
     const ENTRY_TIME = "entry.1956296565";
 
-    /* --- VARIABLES --- */
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let timer;
+    /* --- STATE MANAGEMENT --- */
+    let currentQIndex = 0;
+    let userAnswers = {}; // Stores { questionIndex: selectedOptionIndex }
+    let questionStatus = {}; // Stores { questionIndex: 'visited' | 'answered' | 'review' }
+    let timerInterval;
     let secondsElapsed = 0;
 
-    /* --- ELEMENTS --- */
-    const introScreen = document.getElementById("intro-screen");
-    const quizBox = document.getElementById("quiz-box");
-    const resultBox = document.getElementById("result-box");
-    const questionElement = document.getElementById("question-text");
-    const optionsElement = document.getElementById("options-box");
-    const timerDisplay = document.getElementById("timer-display");
-
-    /* --- FUNCTIONS --- */
-    function startQuiz() {
-        introScreen.classList.add("hidden");
-        quizBox.classList.remove("hidden");
+    /* --- INITIALIZATION --- */
+    window.onload = function() {
+        initPalette();
+        loadQuestion(0);
         startTimer();
-        showQuestion();
-    }
+    };
 
-    function startTimer() {
-        timer = setInterval(() => {
-            secondsElapsed++;
-            let minutes = Math.floor(secondsElapsed / 60);
-            let seconds = secondsElapsed % 60;
-            timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        }, 1000);
-    }
-
-    function showQuestion() {
-        // Safety check: if questions file isn't loaded
-        if (typeof questions === 'undefined') {
-            questionElement.innerText = "Error: questions.js file not found!";
-            return;
-        }
-
-        let currentQuestion = questions[currentQuestionIndex];
-        questionElement.innerText = `Q${currentQuestionIndex + 1}: ${currentQuestion.question}`;
-        optionsElement.innerHTML = "";
-
-        currentQuestion.answers.forEach(answer => {
-            const button = document.createElement("button");
-            button.innerText = answer.text;
-            button.classList.add("btn");
-            button.onclick = () => selectAnswer(answer);
-            optionsElement.appendChild(button);
+    function initPalette() {
+        const grid = document.getElementById("palette-grid");
+        grid.innerHTML = "";
+        questions.forEach((q, index) => {
+            const div = document.createElement("div");
+            div.className = "palette-item";
+            div.innerText = index + 1;
+            div.id = `palette-${index}`;
+            div.onclick = () => loadQuestion(index);
+            grid.appendChild(div);
         });
     }
 
-    function selectAnswer(answer) {
-        if(answer.correct) score++;
+    /* --- NAVIGATION --- */
+    function loadQuestion(index) {
+        // Save status of PREVIOUS question before moving
+        updateStatus(currentQIndex);
+
+        // Update current index
+        currentQIndex = index;
+
+        // Visual updates
+        document.getElementById("q-number").innerText = currentQIndex + 1;
+        document.getElementById("q-text").innerText = questions[currentQIndex].question;
         
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            showQuestion();
+        // Image Handling
+        const imgContainer = document.getElementById("q-image-container");
+        const imgElement = document.getElementById("q-image");
+        if(questions[currentQIndex].image) {
+            imgElement.src = questions[currentQIndex].image;
+            imgContainer.style.display = "block";
         } else {
-            endQuiz();
+            imgContainer.style.display = "none";
+        }
+
+        // Render Options
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+        
+        questions[currentQIndex].answers.forEach((ans, i) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <label>
+                    <input type="radio" name="option" value="${i}" 
+                    onclick="selectOption(${i})" 
+                    ${userAnswers[currentQIndex] === i ? 'checked' : ''}>
+                    ${ans.text}
+                </label>
+            `;
+            optionsContainer.appendChild(li);
+        });
+
+        updatePaletteVisuals();
+    }
+
+    function selectOption(optionIndex) {
+        userAnswers[currentQIndex] = optionIndex;
+    }
+
+    function saveAndNext() {
+        if (userAnswers[currentQIndex] !== undefined) {
+            questionStatus[currentQIndex] = "answered";
+        } else {
+            questionStatus[currentQIndex] = "not_answered";
+        }
+        moveNext();
+    }
+
+    function markReview() {
+        questionStatus[currentQIndex] = "review";
+        moveNext();
+    }
+
+    function clearResponse() {
+        delete userAnswers[currentQIndex];
+        const radios = document.getElementsByName("option");
+        radios.forEach(r => r.checked = false);
+        questionStatus[currentQIndex] = "visited"; // Reset to just visited
+    }
+
+    function changeQuestion(step) {
+        let newIndex = currentQIndex + step;
+        if (newIndex >= 0 && newIndex < questions.length) {
+            loadQuestion(newIndex);
         }
     }
 
-    function endQuiz() {
-        clearInterval(timer);
-        quizBox.classList.add("hidden");
-        resultBox.classList.remove("hidden");
-        document.getElementById("score").innerText = score;
-        document.getElementById("total").innerText = questions.length;
-        document.getElementById("final-time").innerText = timerDisplay.innerText;
+    function moveNext() {
+        if (currentQIndex < questions.length - 1) {
+            loadQuestion(currentQIndex + 1);
+        } else {
+            // If last question, just update palette
+            updateStatus(currentQIndex);
+            updatePaletteVisuals();
+            alert("You are on the last question.");
+        }
     }
 
-    function submitData() {
+    /* --- PALETTE LOGIC --- */
+    function updateStatus(index) {
+        // Logic to determine color based on user action
+        if (questionStatus[index] === "review") return; // Keep purple if reviewed
+
+        if (userAnswers[index] !== undefined) {
+            questionStatus[index] = "answered";
+        } else {
+            questionStatus[index] = "not_answered";
+        }
+    }
+
+    function updatePaletteVisuals() {
+        questions.forEach((_, i) => {
+            const pItem = document.getElementById(`palette-${i}`);
+            pItem.className = "palette-item"; // Reset
+
+            if (i === currentQIndex) {
+                pItem.classList.add("p-current"); // Blue border for current
+            }
+
+            if (questionStatus[i] === "answered") pItem.classList.add("p-answered");
+            else if (questionStatus[i] === "not_answered") pItem.classList.add("p-not_answered");
+            else if (questionStatus[i] === "review") pItem.classList.add("p-review");
+        });
+    }
+
+    /* --- TIMER --- */
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            let m = Math.floor(secondsElapsed / 60);
+            let s = secondsElapsed % 60;
+            document.getElementById("timer").innerText = `${m}:${s < 10 ? '0'+s : s}`;
+        }, 1000);
+    }
+
+    /* --- SUBMISSION --- */
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        document.getElementById("quiz-interface").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+
+        // Calculate Stats
+        let attempted = 0;
+        let reviewed = 0;
+        
+        questions.forEach((_, i) => {
+            if (questionStatus[i] === "answered") attempted++;
+            if (questionStatus[i] === "review") reviewed++;
+        });
+
+        document.getElementById("sum-total").innerText = questions.length;
+        document.getElementById("sum-attempted").innerText = attempted;
+        document.getElementById("sum-review").innerText = reviewed;
+        document.getElementById("sum-skipped").innerText = questions.length - attempted - reviewed;
+    }
+
+    function sendToGoogle() {
         const name = document.getElementById("student-name").value;
-        if(!name) { alert("Please enter your name!"); return; }
+        if (!name) { alert("Enter Name"); return; }
 
-        const timeTaken = document.getElementById("final-time").innerText;
+        // Calculate FINAL SCORE (Hidden from user)
+        let finalScore = 0;
+        questions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            if (userAnswer !== undefined) {
+                if (q.answers[userAnswer].correct) {
+                    finalScore += POSITIVE_MARK;
+                } else {
+                    finalScore -= NEGATIVE_MARK;
+                }
+            }
+        });
 
-        // Construct the Google Form URL silently
+        // Time
+        let timeTaken = document.getElementById("timer").innerText;
+
+        // Send to Google
         const baseURL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?`;
         const submitURL = baseURL + 
             `${ENTRY_NAME}=${encodeURIComponent(name)}&` + 
-            `${ENTRY_SCORE}=${score}&` +
+            `${ENTRY_SCORE}=${finalScore}&` +
             `${ENTRY_TIME}=${encodeURIComponent(timeTaken)}&submit=Submit`;
 
-        // Create a hidden iframe to send data without leaving the page
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
         iframe.src = submitURL;
         document.body.appendChild(iframe);
 
-        // UI Feedback
-        const btn = document.querySelector(".save-btn");
-        btn.innerText = "Saved Successfully!";
-        btn.style.background = "#333";
-        btn.disabled = true;
-
-        alert("Result submitted! You can now close the tab.");
+        alert("Exam Submitted Successfully!");
+        
+        // Disable button
+        document.querySelector("#result-screen button").innerText = "Submitted";
+        document.querySelector("#result-screen button").disabled = true;
     }
 </script>
 
