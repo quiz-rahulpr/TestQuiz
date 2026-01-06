@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Free Quiz</title>
+    <title>Quiz with Leaderboard</title>
     <style>
-        /* --- CSS STYLES --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,56 +16,91 @@
         }
         .quiz-container {
             background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 600px;
             text-align: center;
         }
-        h1 { color: #333; margin-bottom: 20px; }
-        .question { font-size: 1.2rem; margin-bottom: 20px; color: #555; }
-        .options-container { display: flex; flex-direction: column; gap: 10px; }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .timer-box {
+            font-size: 1.1rem;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .question { font-size: 1.3rem; margin-bottom: 25px; color: #34495e; font-weight: 500; }
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
         .btn {
-            padding: 12px 20px;
-            border: 2px solid #007bff;
+            padding: 14px 20px;
+            border: 2px solid #3498db;
             background: transparent;
-            color: #007bff;
-            border-radius: 5px;
+            color: #3498db;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 600;
             transition: 0.3s;
         }
-        .btn:hover { background: #007bff; color: white; }
+        .btn:hover { background: #3498db; color: white; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        
         .hidden { display: none; }
-        .result-box { font-size: 1.5rem; color: #28a745; margin-top: 20px; }
-        #next-btn { 
-            margin-top: 20px; 
-            background-color: #333; 
-            color: white; 
-            border-color: #333;
+        
+        .result-box { margin-top: 20px; }
+        .score-text { font-size: 2rem; color: #27ae60; font-weight: bold; }
+        
+        input[type="text"] {
+            padding: 10px;
+            width: 70%;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .save-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
 
 <div class="quiz-container">
-    <div id="quiz-box">
-        <h1>Welcome to the Quiz!</h1>
+    <div id="intro-screen">
+        <h1>Class Test</h1>
+        <p>You are about to start the quiz.</p>
+        <button class="btn" style="background: #3498db; color: white;" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <div id="quiz-box" class="hidden">
+        <div class="timer-box">Time: <span id="timer-display">0:00</span></div>
         <div id="question-text" class="question">Loading...</div>
         <div id="options-box" class="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question</button>
     </div>
     
     <div id="result-box" class="hidden result-box">
-        You scored <span id="score">0</span> out of <span id="total">0</span>!
-        <br><br>
-        <button class="btn" onclick="location.reload()">Restart Quiz</button>
+        <h1>Quiz Completed!</h1>
+        <div class="score-text">Score: <span id="score">0</span> / <span id="total">0</span></div>
+        <p>Time Taken: <span id="final-time">0:00</span></p>
+        
+        <p>Enter your name to submit your score:</p>
+        <input type="text" id="student-name" placeholder="Your Full Name">
+        <br>
+        <button class="save-btn" onclick="submitData()">Submit Score</button>
     </div>
 </div>
 
 <script>
-    /* --- YOUR QUESTIONS GO HERE --- */
+    /* --- CONFIGURATION: PASTE YOUR QUESTIONS HERE --- */
     const questions = [
         {
             question: "What is the capital of France?",
@@ -78,96 +112,114 @@
             ]
         },
         {
-            question: "Which language runs in a web browser?",
+            question: "Which planet is known as the Red Planet?",
             answers: [
-                { text: "Java", correct: false },
-                { text: "C", correct: false },
-                { text: "Python", correct: false },
-                { text: "JavaScript", correct: true }
-            ]
-        },
-        {
-            question: "What does CSS stand for?",
-            answers: [
-                { text: "Central Style Sheets", correct: false },
-                { text: "Cascading Style Sheets", correct: true },
-                { text: "Cascading Simple Sheets", correct: false },
-                { text: "Cars SUVs Sailboats", correct: false }
+                { text: "Earth", correct: false },
+                { text: "Mars", correct: true },
+                { text: "Jupiter", correct: false },
+                { text: "Saturn", correct: false }
             ]
         }
     ];
 
-    /* --- QUIZ LOGIC --- */
+   /* --- GOOGLE FORM CONFIGURATION --- */
+    const FORM_ID = "1FAIpQLSfdc6KygQ100hICyXkaJYIWVJ7UxKYUw4aV22smmT3nRWCu3g";
+    const ENTRY_NAME = "entry.1088098272";
+    const ENTRY_SCORE = "entry.1899459571";
+    const ENTRY_TIME = "entry.1956296565";
+
+    
+    /* --- LOGIC (DO NOT CHANGE BELOW) --- */
     let currentQuestionIndex = 0;
     let score = 0;
+    let timer;
+    let secondsElapsed = 0;
 
-    const questionElement = document.getElementById("question-text");
-    const optionsElement = document.getElementById("options-box");
-    const nextButton = document.getElementById("next-btn");
+    const introScreen = document.getElementById("intro-screen");
     const quizBox = document.getElementById("quiz-box");
     const resultBox = document.getElementById("result-box");
+    const questionElement = document.getElementById("question-text");
+    const optionsElement = document.getElementById("options-box");
+    const timerDisplay = document.getElementById("timer-display");
 
     function startQuiz() {
+        introScreen.classList.add("hidden");
+        quizBox.classList.remove("hidden");
+        startTimer();
         showQuestion();
     }
 
+    function startTimer() {
+        timer = setInterval(() => {
+            secondsElapsed++;
+            let minutes = Math.floor(secondsElapsed / 60);
+            let seconds = secondsElapsed % 60;
+            timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }, 1000);
+    }
+
     function showQuestion() {
-        resetState();
         let currentQuestion = questions[currentQuestionIndex];
         questionElement.innerText = `Q${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+        optionsElement.innerHTML = "";
 
         currentQuestion.answers.forEach(answer => {
             const button = document.createElement("button");
             button.innerText = answer.text;
             button.classList.add("btn");
-            button.onclick = () => selectAnswer(answer, button);
+            button.onclick = () => selectAnswer(answer);
             optionsElement.appendChild(button);
         });
     }
 
-    function resetState() {
-        nextButton.classList.add("hidden");
-        optionsElement.innerHTML = "";
-    }
-
-    function selectAnswer(answer, btn) {
-        if(answer.correct) {
-            score++;
-            btn.style.backgroundColor = "#28a745"; // Green for correct
-            btn.style.color = "white";
-            btn.style.borderColor = "#28a745";
-        } else {
-            btn.style.backgroundColor = "#dc3545"; // Red for wrong
-            btn.style.color = "white";
-            btn.style.borderColor = "#dc3545";
-        }
+    function selectAnswer(answer) {
+        if(answer.correct) score++;
         
-        // Disable all buttons so user can't click twice
-        const allButtons = optionsElement.children;
-        for(let i=0; i < allButtons.length; i++){
-            allButtons[i].disabled = true;
-        }
-        
-        nextButton.classList.remove("hidden");
-    }
-
-    function nextQuestion() {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.length) {
             showQuestion();
         } else {
-            showScore();
+            endQuiz();
         }
     }
 
-    function showScore() {
+    function endQuiz() {
+        clearInterval(timer);
         quizBox.classList.add("hidden");
         resultBox.classList.remove("hidden");
         document.getElementById("score").innerText = score;
         document.getElementById("total").innerText = questions.length;
+        document.getElementById("final-time").innerText = timerDisplay.innerText;
     }
 
-    startQuiz();
+    function submitData() {
+        const name = document.getElementById("student-name").value;
+        if(!name) { alert("Please enter your name!"); return; }
+
+        const timeTaken = document.getElementById("final-time").innerText;
+
+        // Construct the Google Form URL
+        // Using formResponse to submit silently
+        const baseURL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?`;
+        const submitURL = baseURL + 
+            `${ENTRY_NAME}=${encodeURIComponent(name)}&` + 
+            `${ENTRY_SCORE}=${score}&` +
+            `${ENTRY_TIME}=${encodeURIComponent(timeTaken)}&submit=Submit`;
+
+        // Use a hidden iframe to send data without leaving the page
+        const iframe = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = submitURL;
+        document.body.appendChild(iframe);
+
+        // UI Feedback
+        const btn = document.querySelector(".save-btn");
+        btn.innerText = "Saved!";
+        btn.style.background = "#333";
+        btn.disabled = true;
+
+        alert("Result submitted successfully!");
+    }
 </script>
 
 </body>
