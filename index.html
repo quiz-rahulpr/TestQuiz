@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz with Leaderboard</title>
+    <title>Online Quiz Platform</title>
     <style>
+        /* --- CSS STYLES --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
@@ -25,10 +26,14 @@
         }
         h1 { color: #2c3e50; margin-bottom: 10px; }
         .timer-box {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #e74c3c;
             font-weight: bold;
             margin-bottom: 20px;
+            padding: 10px;
+            background: #ffecec;
+            border-radius: 5px;
+            display: inline-block;
         }
         .question { font-size: 1.3rem; margin-bottom: 25px; color: #34495e; font-weight: 500; }
         .options-container { display: flex; flex-direction: column; gap: 12px; }
@@ -41,7 +46,7 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: 0.3s;
+            transition: 0.2s;
         }
         .btn:hover { background: #3498db; color: white; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -49,35 +54,40 @@
         .hidden { display: none; }
         
         .result-box { margin-top: 20px; }
-        .score-text { font-size: 2rem; color: #27ae60; font-weight: bold; }
+        .score-text { font-size: 2rem; color: #27ae60; font-weight: bold; margin: 20px 0; }
         
         input[type="text"] {
-            padding: 10px;
+            padding: 12px;
             width: 70%;
             margin-top: 20px;
-            border: 1px solid #ccc;
+            border: 2px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
+            outline: none;
         }
+        input[type="text"]:focus { border-color: #3498db; }
         
         .save-btn {
             margin-top: 15px;
-            padding: 10px 25px;
+            padding: 12px 30px;
             background-color: #27ae60;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1.1rem;
+            transition: 0.3s;
         }
+        .save-btn:hover { background-color: #219150; }
     </style>
 </head>
 <body>
 
 <div class="quiz-container">
     <div id="intro-screen">
-        <h1>Class Test</h1>
+        <h1>Final Assessment</h1>
         <p>You are about to start the quiz.</p>
+        <p><strong>Note:</strong> Your time will be recorded.</p>
         <button class="btn" style="background: #3498db; color: white;" onclick="startQuiz()">Start Quiz</button>
     </div>
 
@@ -92,49 +102,29 @@
         <div class="score-text">Score: <span id="score">0</span> / <span id="total">0</span></div>
         <p>Time Taken: <span id="final-time">0:00</span></p>
         
-        <p>Enter your name to submit your score:</p>
-        <input type="text" id="student-name" placeholder="Your Full Name">
+        <p>Enter your full name to submit your score:</p>
+        <input type="text" id="student-name" placeholder="Ex: Rahul P.">
         <br>
         <button class="save-btn" onclick="submitData()">Submit Score</button>
     </div>
 </div>
 
-<script>
-    /* --- CONFIGURATION: PASTE YOUR QUESTIONS HERE --- */
-    const questions = [
-        {
-            question: "What is the capital of France?",
-            answers: [
-                { text: "Berlin", correct: false },
-                { text: "Madrid", correct: false },
-                { text: "Paris", correct: true },
-                { text: "Lisbon", correct: false }
-            ]
-        },
-        {
-            question: "Which planet is known as the Red Planet?",
-            answers: [
-                { text: "Earth", correct: false },
-                { text: "Mars", correct: true },
-                { text: "Jupiter", correct: false },
-                { text: "Saturn", correct: false }
-            ]
-        }
-    ];
+<script src="questions.js"></script>
 
-   /* --- GOOGLE FORM CONFIGURATION --- */
+<script>
+    /* --- GOOGLE FORM CONFIGURATION (ALREADY FILLED) --- */
     const FORM_ID = "1FAIpQLSfdc6KygQ100hICyXkaJYIWVJ7UxKYUw4aV22smmT3nRWCu3g";
     const ENTRY_NAME = "entry.1088098272";
     const ENTRY_SCORE = "entry.1899459571";
     const ENTRY_TIME = "entry.1956296565";
 
-    
-    /* --- LOGIC (DO NOT CHANGE BELOW) --- */
+    /* --- VARIABLES --- */
     let currentQuestionIndex = 0;
     let score = 0;
     let timer;
     let secondsElapsed = 0;
 
+    /* --- ELEMENTS --- */
     const introScreen = document.getElementById("intro-screen");
     const quizBox = document.getElementById("quiz-box");
     const resultBox = document.getElementById("result-box");
@@ -142,6 +132,7 @@
     const optionsElement = document.getElementById("options-box");
     const timerDisplay = document.getElementById("timer-display");
 
+    /* --- FUNCTIONS --- */
     function startQuiz() {
         introScreen.classList.add("hidden");
         quizBox.classList.remove("hidden");
@@ -159,6 +150,12 @@
     }
 
     function showQuestion() {
+        // Safety check: if questions file isn't loaded
+        if (typeof questions === 'undefined') {
+            questionElement.innerText = "Error: questions.js file not found!";
+            return;
+        }
+
         let currentQuestion = questions[currentQuestionIndex];
         questionElement.innerText = `Q${currentQuestionIndex + 1}: ${currentQuestion.question}`;
         optionsElement.innerHTML = "";
@@ -198,15 +195,14 @@
 
         const timeTaken = document.getElementById("final-time").innerText;
 
-        // Construct the Google Form URL
-        // Using formResponse to submit silently
+        // Construct the Google Form URL silently
         const baseURL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?`;
         const submitURL = baseURL + 
             `${ENTRY_NAME}=${encodeURIComponent(name)}&` + 
             `${ENTRY_SCORE}=${score}&` +
             `${ENTRY_TIME}=${encodeURIComponent(timeTaken)}&submit=Submit`;
 
-        // Use a hidden iframe to send data without leaving the page
+        // Create a hidden iframe to send data without leaving the page
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
         iframe.src = submitURL;
@@ -214,11 +210,11 @@
 
         // UI Feedback
         const btn = document.querySelector(".save-btn");
-        btn.innerText = "Saved!";
+        btn.innerText = "Saved Successfully!";
         btn.style.background = "#333";
         btn.disabled = true;
 
-        alert("Result submitted successfully!");
+        alert("Result submitted! You can now close the tab.");
     }
 </script>
 
