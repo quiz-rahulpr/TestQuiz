@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Free Quiz</title>
+    <style>
+        /* --- CSS STYLES --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .question { font-size: 1.2rem; margin-bottom: 20px; color: #555; }
+        .options-container { display: flex; flex-direction: column; gap: 10px; }
+        .btn {
+            padding: 12px 20px;
+            border: 2px solid #007bff;
+            background: transparent;
+            color: #007bff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #007bff; color: white; }
+        .hidden { display: none; }
+        .result-box { font-size: 1.5rem; color: #28a745; margin-top: 20px; }
+        #next-btn { 
+            margin-top: 20px; 
+            background-color: #333; 
+            color: white; 
+            border-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-box">
+        <h1>Welcome to the Quiz!</h1>
+        <div id="question-text" class="question">Loading...</div>
+        <div id="options-box" class="options-container"></div>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question</button>
+    </div>
+    
+    <div id="result-box" class="hidden result-box">
+        You scored <span id="score">0</span> out of <span id="total">0</span>!
+        <br><br>
+        <button class="btn" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    /* --- YOUR QUESTIONS GO HERE --- */
+    const questions = [
+        {
+            question: "What is the capital of France?",
+            answers: [
+                { text: "Berlin", correct: false },
+                { text: "Madrid", correct: false },
+                { text: "Paris", correct: true },
+                { text: "Lisbon", correct: false }
+            ]
+        },
+        {
+            question: "Which language runs in a web browser?",
+            answers: [
+                { text: "Java", correct: false },
+                { text: "C", correct: false },
+                { text: "Python", correct: false },
+                { text: "JavaScript", correct: true }
+            ]
+        },
+        {
+            question: "What does CSS stand for?",
+            answers: [
+                { text: "Central Style Sheets", correct: false },
+                { text: "Cascading Style Sheets", correct: true },
+                { text: "Cascading Simple Sheets", correct: false },
+                { text: "Cars SUVs Sailboats", correct: false }
+            ]
+        }
+    ];
+
+    /* --- QUIZ LOGIC --- */
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionElement = document.getElementById("question-text");
+    const optionsElement = document.getElementById("options-box");
+    const nextButton = document.getElementById("next-btn");
+    const quizBox = document.getElementById("quiz-box");
+    const resultBox = document.getElementById("result-box");
+
+    function startQuiz() {
+        showQuestion();
+    }
+
+    function showQuestion() {
+        resetState();
+        let currentQuestion = questions[currentQuestionIndex];
+        questionElement.innerText = `Q${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+
+        currentQuestion.answers.forEach(answer => {
+            const button = document.createElement("button");
+            button.innerText = answer.text;
+            button.classList.add("btn");
+            button.onclick = () => selectAnswer(answer, button);
+            optionsElement.appendChild(button);
+        });
+    }
+
+    function resetState() {
+        nextButton.classList.add("hidden");
+        optionsElement.innerHTML = "";
+    }
+
+    function selectAnswer(answer, btn) {
+        if(answer.correct) {
+            score++;
+            btn.style.backgroundColor = "#28a745"; // Green for correct
+            btn.style.color = "white";
+            btn.style.borderColor = "#28a745";
+        } else {
+            btn.style.backgroundColor = "#dc3545"; // Red for wrong
+            btn.style.color = "white";
+            btn.style.borderColor = "#dc3545";
+        }
+        
+        // Disable all buttons so user can't click twice
+        const allButtons = optionsElement.children;
+        for(let i=0; i < allButtons.length; i++){
+            allButtons[i].disabled = true;
+        }
+        
+        nextButton.classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            showScore();
+        }
+    }
+
+    function showScore() {
+        quizBox.classList.add("hidden");
+        resultBox.classList.remove("hidden");
+        document.getElementById("score").innerText = score;
+        document.getElementById("total").innerText = questions.length;
+    }
+
+    startQuiz();
+</script>
+
+</body>
+</html>
